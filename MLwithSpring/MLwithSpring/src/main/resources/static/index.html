@@ -1,0 +1,153 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Iris Flower Classifier</title>
+    <style>
+        body {
+            font-family: 'Roboto', sans-serif;
+            background-color: #f4f7fa;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+        }
+
+        .container {
+            background-color: #ffffff;
+            padding: 40px;
+            border-radius: 10px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            width: 400px;
+            text-align: center;
+            animation: fadeIn 1.5s ease-in-out;
+        }
+
+        h1 {
+            color: #4CAF50;
+            font-size: 2em;
+            margin-bottom: 10px;
+        }
+
+        p {
+            font-size: 1.2em;
+            color: #555;
+            margin-bottom: 20px;
+        }
+
+        input {
+            width: 90%;
+            padding: 10px;
+            margin: 10px 0;
+            border-radius: 8px;
+            border: 1px solid #ddd;
+            font-size: 1em;
+            transition: border-color 0.3s;
+        }
+
+        input:focus {
+            border-color: #4CAF50;
+            outline: none;
+        }
+
+        button {
+            width: 100%;
+            padding: 12px;
+            background-color: #4CAF50;
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-size: 1.2em;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+        }
+
+        button:hover {
+            background-color: #45a049;
+        }
+
+        #result {
+            margin-top: 20px;
+            font-size: 1.2em;
+            font-weight: bold;
+            color: #333;
+            opacity: 0;
+            animation: fadeInResult 1s forwards;
+        }
+
+        @keyframes fadeIn {
+            0% {
+                opacity: 0;
+                transform: translateY(-30px);
+            }
+            100% {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        @keyframes fadeInResult {
+            0% {
+                opacity: 0;
+            }
+            100% {
+                opacity: 1;
+            }
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <h1>Iris Flower Classifier</h1>
+    <p>Enter the sepal and petal dimensions below to predict the flower class:</p>
+
+    <input type="number" step="any" id="f1" placeholder="Sepal Length (cm)" required>
+    <input type="number" step="any" id="f2" placeholder="Sepal Width (cm)" required>
+    <input type="number" step="any" id="f3" placeholder="Petal Length (cm)" required>
+    <input type="number" step="any" id="f4" placeholder="Petal Width (cm)" required>
+
+    <button onclick="predict()">Predict</button>
+
+    <div id="result"></div>
+</div>
+
+<script>
+    async function predict() {
+        const features = [
+            parseFloat(document.getElementById("f1").value),
+            parseFloat(document.getElementById("f2").value),
+            parseFloat(document.getElementById("f3").value),
+            parseFloat(document.getElementById("f4").value)
+        ];
+
+        // Validate input fields
+        if (features.some(isNaN)) {
+            document.getElementById("result").innerText = "Please enter valid numbers for all fields!";
+            document.getElementById("result").style.color = "#FF0000"; // Red error text
+            return;
+        }
+
+        const response = await fetch("/api/predict", {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json"
+            },
+            body: JSON.stringify({ features: features })
+        });
+
+        if (!response.ok) {
+            document.getElementById("result").innerText = "Error: Could not fetch prediction.";
+            return;
+        }
+
+        const resultText = await response.text();
+        document.getElementById("result").innerText = "Prediction: " + resultText;
+        document.getElementById("result").style.color = "#4CAF50"; // Green result text
+    }
+</script>
+
+</body>
+</html>
